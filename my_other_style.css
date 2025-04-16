@@ -1,0 +1,78 @@
+body{
+    font-family:Arial, Helvetica, sans-serif;
+    font-weight: 400;
+    color:rgb(84, 77, 67); 
+    background-color: #fae2b4;
+}
+
+h1{
+    font-weight: 100;
+    color:rgb(228, 175, 70)
+}
+
+.header_div {
+    top: 5px;
+    left: 5px;
+    right: 5px;
+    height: 100px;
+    text-align:center;
+    font-family: cursive;
+    font-weight: 300;
+    line-height: 100px;
+    font-size:75px;
+    border: 2px dashed;
+}
+
+.main_div {
+    top: 200px;
+    right: 114px;
+    left:114px;
+    bottom:114px;
+    text-align:center;
+    color:rgb(235, 121, 121);
+    font-family:Verdana, Geneva, Tahoma, sans-serif;
+    font-size:smaller;
+}
+
+.common_div{
+    background-color: rgb(241, 146, 146);
+    border: 2px dashed;
+    position:absolute;
+    overflow:auto;
+    padding:4px;
+    top:400px;
+    right: 100px;
+    left: 100px;
+    background-color: rgb(172, 210, 243);
+    text-align: center;
+}
+
+.end_div{
+position:static;
+left: 100px;
+right: 100px;
+background-color: rgb(250, 215, 215);
+border: 2px solid;
+top: 2200px;
+text-align:center;
+font-family:Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+}
+
+.list_div{
+    background-color: rgb(255, 255, 255);
+    border: 2px solid;
+    overflow:auto;
+    padding:4px;
+    top:500;
+    right: 100px;
+    left: 100px;
+    background-color: rgb(246, 246, 246);  
+    font-family:'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+}
+
+  .center_image {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+     /* or whatever size you want */
+  }

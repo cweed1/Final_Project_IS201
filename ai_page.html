@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Cheesy Delights</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 30px auto;
+            max-width: 800px;
+            background-color: #f8f0e3; /* Light creamy background */
+            color: #544837; /* Warm, dark brown text */
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        h1, h2, h3 {
+            color: #a38b6a; /* Muted gold heading color */
+            text-align: center;
+        }
+
+        .cheese-selection {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .cheese-button {
+            padding: 18px;
+            border: 1px solid #d1c4b0; /* Light tan border */
+            border-radius: 8px;
+            background-color: #f0e6d2; /* Light tan background */
+            cursor: pointer;
+            text-align: center;
+            font-weight: bold;
+            color: #776e65; /* Medium brown text */
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        .cheese-button:hover {
+            background-color: #e6dac6;
+            transform: scale(1.03);
+        }
+
+        .recipe-container {
+            background-color: #fff;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .recipe-container h3 {
+            color: #a38b6a;
+            border-bottom: 2px dashed #d1c4b0;
+            padding-bottom: 12px;
+            margin-bottom: 20px;
+        }
+
+        .recipe-details {
+            text-align: left;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .recipe-details strong {
+            color: #776e65;
+        }
+
+        .recipe-actions button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            background-color: #8fbc8f; /* Light sea green save button */
+            color: #fff;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            margin-right: 10px;
+        }
+
+        .recipe-actions button:hover {
+            background-color: #7cb388;
+            transform: scale(1.05);
+        }
+
+        .recipe-actions button:last-child {
+            background-color: #d3a683; /* Sandy brown back button */
+        }
+
+        .recipe-actions button:last-child:hover {
+            background-color: #c1997a;
+        }
+
+        .recipe-book {
+            background-color: #fff;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .recipe-book h2 {
+            color: #a38b6a;
+            border-bottom: 2px dashed #d1c4b0;
+            padding-bottom: 12px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .saved-recipe {
+            border-bottom: 1px dotted #e0e0e0;
+            padding-bottom: 18px;
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .saved-recipe-details {
+            flex-grow: 1;
+        }
+
+        .delete-button {
+            background-color: #e74c3c; /* Red delete button */
+            color: #fff;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        .delete-button:hover {
+            background-color: #c0392b;
+            transform: scale(1.05);
+        }
+
+        .saved-recipe:last-child {
+            border-bottom: none;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>My Cheesy Delights</h1>
+
+    <div class="cheese-selection" id="cheeseSelection">
+        </div>
+
+    <div class="recipe-container hidden" id="recipeDisplay">
+        <h3>Recipe Title</h3>
+        <div class="recipe-details">
+            <p><strong>Ingredients:</strong> <span id="recipeIngredients"></span></p>
+            <p><strong>Instructions:</strong> <span id="recipeInstructions"></span></p>
+        </div>
+        <div class="recipe-actions">
+            <button id="saveRecipe">Save to My Book</button>
+            <button id="goBack">Back to Cheese Selection</button>
+        </div>
+    </div>
+
+    <div class="recipe-book" id="recipeBook">
+        <h2>My Saved Cheesy Recipes</h2>
+        <div id="savedRecipesList">
+            <p id="emptyBookMessage">Your recipe book is empty.</p>
+        </div>
+    </div>
+
+    <script>
+        const cheeseSelectionDiv = document.getElementById('cheeseSelection');
+        const recipeDisplayDiv = document.getElementById('recipeDisplay');
+        const recipeTitleElement = document.querySelector('#recipeDisplay h3');
+        const recipeIngredientsElement = document.getElementById('recipeIngredients');
+        const recipeInstructionsElement = document.getElementById('recipeInstructions');
+        const saveRecipeButton = document.getElementById('saveRecipe');
+        const goBackButton = document.getElementById('goBack');
+        const recipeBookDiv = document.getElementById('recipeBook');
+        const savedRecipesListDiv = document.getElementById('savedRecipesList');
+        const emptyBookMessage = document.getElementById('emptyBookMessage');
+
+        let selectedCheese = null;
+        let currentRecipe = null;
+        let savedRecipes = JSON.parse(localStorage.getItem('cheeseRecipes')) || [];
+
+        const cheeses = [
+            'Cheddar', 'Mozzarella', 'Parmesan', 'Gouda', 'Brie',
+            'Feta', 'Swiss', 'Blue Cheese', 'Monterey Jack', 'Ricotta'
+        ];
+
+        const recipes = {
+            'Cheddar': {
+                title: 'Golden Cheddar Toasties',
+                ingredients: ['2 slices sourdough bread', '50g mature cheddar, grated', '20g butter, softened'],
+                instructions: ['Spread butter evenly on one side of each bread slice.', 'Place one slice of bread, butter-side down, in a warm pan.', 'Sprinkle the grated cheddar evenly over the bread.', 'Top with the other slice of bread, butter-side up.', 'Cook for 3-4 minutes per side, pressing gently, until golden and the cheese is melted and gooey.']
+            },
+            'Mozzarella': {
+                title: 'Simple Caprese Skewers',
+                ingredients: ['1 punnet cherry tomatoes', '1 ball fresh mozzarella, cut into bite-sized pieces', 'Fresh basil leaves', 'Balsamic glaze'],
+                instructions: ['Thread a cherry tomato, a piece of mozzarella, and a basil leaf onto small skewers.', 'Arrange the skewers on a platter.', 'Drizzle lightly with balsamic glaze before serving.']
+            },
+            'Parmesan': {
+                title: 'Crispy Parmesan Twists',
+                ingredients: ['1 sheet ready-made puff pastry', '50g grated Parmesan cheese', '1 egg, beaten', 'Pinch of black pepper'],
+                instructions: ['Preheat oven to 200°C (180°C fan/ Gas Mark 6).', 'Unroll the puff pastry sheet.', 'Brush the entire surface with the beaten egg.', 'Sprinkle the grated Parmesan cheese and black pepper evenly over the egg.', 'Cut the pastry into 1-inch wide strips.', 'Twist each strip several times and arrange them on a baking tray lined with parchment paper.', 'Bake for 10-12 minutes, or until golden brown and crispy.']
+            },
+            'Gouda': {
+                title: 'Gouda & Apple Bites',
+                ingredients: ['1 red apple, cored and sliced', '50g smoked Gouda, cut into small cubes', '1 tbsp honey', '1 tsp lemon juice'],
+                instructions: ['In a small bowl, gently toss the apple slices with lemon juice to prevent browning.', 'Arrange the apple slices on a small platter.', 'Top each apple slice with a cube of smoked Gouda.', 'Drizzle lightly with honey before serving.']
+            },
+            'Brie': {
+                title: 'Warm Brie & Berry Crostini',
+                ingredients: ['1 baguette, sliced into 1-inch pieces', '100g Brie cheese, sliced', '50g mixed berries (strawberries, raspberries, blueberries)', '1 tbsp balsamic vinegar', '1 tsp fresh thyme leaves'],
+                instructions: ['Preheat oven to 180°C (160°C fan/ Gas Mark 4).', 'Arrange the baguette slices on a baking tray and bake for 5-7 minutes until lightly golden.', 'Top each crostini with a slice of Brie.', 'Scatter the mixed berries over the Brie.', 'Drizzle with balsamic vinegar and sprinkle with fresh thyme leaves.', 'Return to the oven for another 2-3 minutes until the Brie is slightly melted and warm.']
+            },
+            'Feta': {
+                title: 'Watermelon & Feta Salad Cups',
+                ingredients: ['2 cups cubed watermelon', '100g Feta cheese, crumbled', '1/4 cup fresh mint leaves, chopped', '1 tbsp olive oil', '1 tsp lime juice'],
+                instructions: ['Gently combine the cubed watermelon, crumbled Feta cheese, and chopped mint leaves in a bowl.', 'In a small bowl, whisk together the olive oil and lime juice.', 'Drizzle the dressing over the watermelon and Feta mixture.', 'Spoon the salad into small serving cups or bowls and serve immediately.']
+            },
+            'Swiss': {
+                title: 'Mini Swiss & Spinach Quiches',
+                ingredients: ['1 sheet ready-made shortcrust pastry', '100g fresh spinach, wilted and chopped', '50g grated Swiss cheese', '2 eggs', '100ml double cream', 'Pinch of nutmeg', 'Salt and pepper to taste'],
+                instructions: ['Preheat oven to 180°C (160°C fan/ Gas Mark 4).', 'Lightly grease a 12-hole muffin tin.', 'Cut out circles from the shortcrust pastry and line each muffin hole.', 'Divide the chopped spinach and grated Swiss cheese among the pastry cases.', 'In a bowl, whisk together the eggs, double cream, nutmeg, salt, and pepper.', 'Pour the egg mixture into each pastry case.', 'Bake for 15-20 minutes, or until the filling is set and lightly golden.']
+            },
+            'Blue Cheese': {
+                title: 'Blue Cheese & Walnut Dip',
+                ingredients: ['100g cream cheese, softened', '50g blue cheese, crumbled', '2 tbsp chopped walnuts', '1 tbsp milk', 'Pinch of black pepper'],
+                instructions: ['In a bowl, combine the softened cream cheese and crumbled blue cheese.', 'Stir in the chopped walnuts, milk, and black pepper.', 'Mix well until smooth and creamy.', 'Serve chilled with crackers, crudités, or crusty bread.']
+            },
+            'Monterey Jack': {
+                title: 'Spicy Monterey Jack & Corn Fritters',
+                ingredients: ['1 cup frozen corn, thawed', '50g Monterey Jack cheese, grated', '1/4 cup all-purpose flour', '1 egg, lightly beaten', '1 tbsp chopped jalapeño (optional)', 'Vegetable oil, for frying'],
+                instructions: ['In a bowl, combine the thawed corn, grated Monterey Jack cheese, flour, lightly beaten egg, and chopped jalapeño (if using).', 'Mix well until just combined.', 'Heat about 1 inch of vegetable oil in a skillet over medium heat.', 'Drop spoonfuls of the corn mixture into the hot oil.', 'Fry for 2-3 minutes per side, or until golden brown and crispy.', 'Remove the fritters with a slotted spoon and drain them on paper towels.', 'Serve warm.']
+            },
+            'Ricotta': {
+                title: 'Lemon & Ricotta Bruschetta',
+                ingredients: ['1 baguette, sliced into 1/2-inch pieces', '150g ricotta cheese', 'Zest of 1/2 lemon', '1 tbsp olive oil', 'Fresh parsley, chopped', 'Salt and pepper to taste'],
+                instructions: ['Preheat oven to 180°C (160°C fan/ Gas Mark 4).', 'Arrange the baguette slices on a baking tray and brush lightly with olive oil.', 'Bake for 8-10 minutes until lightly golden and crisp.', 'In a bowl, combine the ricotta cheese, lemon zest, olive oil, chopped parsley, salt, and pepper.', 'Spread the ricotta mixture evenly over the toasted baguette slices.', 'Serve immediately.']
+            }
+        };
+
+        function generateCheeseButtons() {
+            cheeses.forEach(cheese => {
+                const button = document.createElement('div');
+                button.classList.add('cheese-button');
+                button.textContent = cheese;
+                button.addEventListener('click', () => {
+                    selectedCheese = cheese;
+                    showRecipe(cheese);
+                });
+                cheeseSelectionDiv.appendChild(button);
+            });
+        }
+
+        function showRecipe(cheese) {
+            if (recipes[cheese]) {
+                const recipe = recipes[cheese];
+                recipeTitleElement.textContent = recipe.title;
+                recipeIngredientsElement.textContent = recipe.ingredients.join(', ');
+                recipeInstructionsElement.textContent = recipe.instructions.join(' ');
+                currentRecipe = recipe;
+                cheeseSelectionDiv.classList.add('hidden');
+                recipeDisplayDiv.classList.remove('hidden');
+            } else {
+                recipeTitleElement.textContent = 'No recipe found for ' + cheese;
+                recipeIngredientsElement.textContent = '';
+                recipeInstructionsElement.textContent = '';
+                currentRecipe = null;
+                cheeseSelectionDiv.classList.add('hidden');
+                recipeDisplayDiv.classList.remove('hidden');
+            }
+        }
+
+        goBackButton.addEventListener('click', () => {
+            selectedCheese = null;
+            currentRecipe = null;
+            recipeDisplayDiv.classList.add('hidden');
+            cheeseSelectionDiv.classList.remove('hidden');
+        });
+
+        saveRecipeButton.addEventListener('click', () => {
+            if (currentRecipe && selectedCheese) {
+                const recipeToSave = {
+                    cheese: selectedCheese,
+                    recipe: currentRecipe
+                };
+                savedRecipes.push(recipeToSave);
+                localStorage.setItem('cheeseRecipes', JSON.stringify(savedRecipes));
+                displaySavedRecipes();
+                alert(`"${currentRecipe.title}" with ${selectedCheese} saved to your book!`);
+            } else {
+                alert('No recipe to save.');
+            }
+        });
+
+        function displaySavedRecipes() {
+            savedRecipesListDiv.innerHTML = '';
+            if (savedRecipes.length === 0) {
+                emptyBookMessage.classList.remove('hidden');
+            } else {
+                emptyBookMessage.classList.add('hidden');
+                savedRecipes.forEach((savedRecipe, index) => {
+                    const recipeDiv = document.createElement('div');
+                    recipeDiv.classList.add('saved-recipe');
+                    recipeDiv.innerHTML = `
+                        <div class="saved-recipe-details">
+                            <h3><span class="math-inline">\{savedRecipe\.recipe\.title\} \(</span>{savedRecipe.cheese})</h3>
+                            <p><strong>Ingredients:</strong> ${savedRecipe.recipe.ingredients.join(', ')}</p>
+                            <p><strong>Instructions:</strong> <span class="math-inline">\{savedRecipe\.recipe\.instructions\.join\(' '\)\}</p\>
+</div\>
+<button class\="delete\-button" data\-index\="</span>{index}">Delete</button>
+                    `;
+                    savedRecipesListDiv.appendChild(recipeDiv);
+
+                    const deleteButton = recipeDiv.querySelector('.delete-button');
+                    deleteButton.addEventListener('click', (event) => {
+                        const indexToDelete = parseInt(event.target.dataset.index);
+                        deleteRecipe(indexToDelete);
+                    });});
+            }
+        }
+
+        function deleteRecipe(index) {
+            savedRecipes.splice(index, 1);
+            localStorage.setItem('cheeseRecipes', JSON.stringify(savedRecipes));
+            displaySavedRecipes();
+        }
+
+        // Initial setup
+        generateCheeseButtons();
+        displaySavedRecipes();
+    </script>
+<a href="index.html"> My Resume</a> <br><br>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+ 
+                   
+
+
+
+
+
+
+       
